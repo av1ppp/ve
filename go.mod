@@ -1,3 +1,3 @@
-module github.com/av1ppp/ver
+module github.com/av1ppp/ve
 
-go 1.23.3
+go 1.25.5
