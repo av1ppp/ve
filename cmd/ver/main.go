@@ -6,19 +6,15 @@ import (
 )
 
 const (
+	appName = "ver"
+	appDesc = "Versioning tool"
+
 	actionInit = "init"
 	actionIncr = "incr"
 	actionGet  = "get"
 	actionHelp = "help"
-)
 
-const (
-	appName = "ver"
-	appDesc = "Versioning tool"
-)
-
-const (
-	versionFile = ".version"
+	versionFile = "VERSION"
 )
 
 func main() {
@@ -60,12 +56,12 @@ func handleActionInit() error {
 		return err
 	}
 
-	version := CreateVersionStruct(1)
-	return version.WriteToFile(versionFile)
+	version := NewVersionStruct(1)
+	return version.WriteFile(versionFile)
 }
 
 func handleActionIncr() error {
-	oldVersion, err := ParseVersionStructFromString(versionFile)
+	oldVersion, err := ParseVersionFile(versionFile)
 	if err != nil {
 		if os.IsNotExist(err) {
 			return errors.New("Version file '" + versionFile + "' does not exist. Run '" + appName + " " + actionInit + "' first")
@@ -73,7 +69,7 @@ func handleActionIncr() error {
 		return err
 	}
 
-	newVersion := CreateVersionStruct(0)
+	newVersion := NewVersionStruct(0)
 
 	if oldVersion.year == newVersion.year && oldVersion.dayOfYear == newVersion.dayOfYear {
 		newVersion.micro = oldVersion.micro + 1
@@ -81,11 +77,11 @@ func handleActionIncr() error {
 		newVersion.micro = 1
 	}
 
-	return newVersion.WriteToFile(versionFile)
+	return newVersion.WriteFile(versionFile)
 }
 
 func handleActionGet() error {
-	version, err := ParseVersionStructFromString(versionFile)
+	version, err := ParseVersionFile(versionFile)
 	if err != nil {
 		if os.IsNotExist(err) {
 			return errors.New("Version file '" + versionFile + "' does not exist. Run '" + appName + " " + actionInit + "' first")

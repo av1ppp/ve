@@ -8,30 +8,30 @@ import (
 	"time"
 )
 
-type versionStruct struct {
+type VersionStruct struct {
 	year      int
 	dayOfYear int
 	micro     int
 }
 
-func CreateVersionStruct(micro int) *versionStruct {
+func NewVersionStruct(micro int) *VersionStruct {
 	now := time.Now().UTC()
-	version := &versionStruct{}
+	version := VersionStruct{}
 	version.year = now.Year() - 2000
 	version.dayOfYear = int(now.YearDay())
-	version.micro = 1
-	return version
+	version.micro = micro
+	return &version
 }
 
-func ParseVersionStructFromString(s string) (*versionStruct, error) {
-	data, err := os.ReadFile(s)
+func ParseVersionFile(name string) (*VersionStruct, error) {
+	data, err := os.ReadFile(name)
 	if err != nil {
 		return nil, err
 	}
 
 	parts := strings.Split(string(data), ".")
 	if len(parts) != 3 {
-		return nil, errors.New("Invalid version file")
+		return nil, errors.New("invalid version file")
 	}
 
 	rawYear := parts[0]
@@ -40,30 +40,30 @@ func ParseVersionStructFromString(s string) (*versionStruct, error) {
 
 	year, err := strconv.Atoi(rawYear)
 	if err != nil {
-		return nil, errors.New("Invalid year in version file")
+		return nil, errors.New("invalid year in version file")
 	}
 
 	dayOfYear, err := strconv.Atoi(rawDayOfYear)
 	if err != nil {
-		return nil, errors.New("Invalid day of year in version file")
+		return nil, errors.New("invalid day of year in version file")
 	}
 
 	micro, err := strconv.Atoi(rawMicro)
 	if err != nil {
-		return nil, errors.New("Invalid micro in version file")
+		return nil, errors.New("invalid micro in version file")
 	}
 
-	return &versionStruct{
+	return &VersionStruct{
 		year:      year,
 		dayOfYear: dayOfYear,
 		micro:     micro,
 	}, nil
 }
 
-func (self *versionStruct) String() string {
+func (self *VersionStruct) String() string {
 	return strconv.Itoa(self.year) + "." + strconv.Itoa(self.dayOfYear) + "." + strconv.Itoa(self.micro)
 }
 
-func (self *versionStruct) WriteToFile(name string) error {
+func (self *VersionStruct) WriteFile(name string) error {
 	return os.WriteFile(name, []byte(self.String()), 0644)
 }
