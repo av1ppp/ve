@@ -56,12 +56,12 @@ func handleActionInit() error {
 		return err
 	}
 
-	version := NewVersionStruct(1)
-	return version.WriteFile(versionFile)
+	v := NewVersion()
+	return v.WriteFile(versionFile)
 }
 
 func handleActionIncr() error {
-	oldVersion, err := ParseVersionFile(versionFile)
+	oldv, err := ParseVersionFile(versionFile)
 	if err != nil {
 		if os.IsNotExist(err) {
 			return errors.New("Version file '" + versionFile + "' does not exist. Run '" + appName + " " + actionInit + "' first")
@@ -69,15 +69,8 @@ func handleActionIncr() error {
 		return err
 	}
 
-	newVersion := NewVersionStruct(0)
-
-	if oldVersion.year == newVersion.year && oldVersion.dayOfYear == newVersion.dayOfYear {
-		newVersion.micro = oldVersion.micro + 1
-	} else {
-		newVersion.micro = 1
-	}
-
-	return newVersion.WriteFile(versionFile)
+	newv := oldv.Increment()
+	return newv.WriteFile(versionFile)
 }
 
 func handleActionGet() error {
